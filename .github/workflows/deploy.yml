@@ -25,7 +25,7 @@ jobs:
           docker buildx build \
             --platform linux/amd64 \
             --push \
-            -t ghcr.io/${{ github.repository_owner }}/ghcr:latest .
+            -t ghcr.io/judgerth/ghcr:latest .
 
   deploy:
     needs: [build-and-push]
@@ -38,7 +38,7 @@ jobs:
 
       - name: SSH into EC2 and pull/run container
         run: |
-          # 환경변수 준비 (secrets에 해당 값들을 넣어두어야 값이 똑바로 읽어와진다!)
+          # 환경변수 준비 (secrets에 해당 값들을 넣어두어야 값이 똑바로 읽어진다!)
           HOST=${{ secrets.EC2_HOST }}
           USER=${{ secrets.EC2_USER }}
 
@@ -48,7 +48,7 @@ jobs:
 
           # GHCR로부터 최신 이미지 pull
           ssh -o StrictHostKeyChecking=no -i key.pem $USER@$HOST "docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_PAT }}"
-          ssh -o StrictHostKeyChecking=no -i key.pem $USER@$HOST "docker pull ghcr.io/${{ github.repository_owner }}/ghcr:latest"
+          ssh -o StrictHostKeyChecking=no -i key.pem $USER@$HOST "docker pull ghcr.io/judgerth/ghcr:latest"
 
           # 새로운 컨테이너 실행 (포트 매핑)
-          ssh -o StrictHostKeyChecking=no -i key.pem $USER@$HOST "docker run -d --name ghcr -p 3000:3000 ghcr.io/${{ github.repository_owner }}/ghcr:latest"
+          ssh -o StrictHostKeyChecking=no -i key.pem $USER@$HOST "docker run -d --name ghcr -p 3000:3000 ghcr.io/judgerth/ghcr:latest"
